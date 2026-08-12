@@ -1,0 +1,20 @@
+{
+  "name": "gp-language-pack-server",
+  "version": "1.0.0",
+  "description": "Generates and serves language pack downloads from GlotPress translations via the WordPress REST API.",
+  "main": "gp-language-pack-server.php",
+  "scripts": {
+    "make-pot": "composer makepot",
+    "release": "npm run make-pot && wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/",
+    "betarelease": "npm run make-pot && wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/"
+  },
+  "files": [
+    "gp-language-pack-server.php",
+    "includes/",
+    "languages/",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@wordpress/scripts": "^34.1.0"
+  }
+}

@@ -1,0 +1,31 @@
+# Dependencies
+/node_modules/
+/vendor/
+/packages/
+
+# Build and Release artifacts
+/deploy/
+/languages/
+*.zip
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Other files
+/client/

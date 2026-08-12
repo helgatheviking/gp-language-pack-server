@@ -1,0 +1,63 @@
+{
+  "name": "helgatheviking/gp-language-pack-server",
+  "description": "Generates and serves language pack downloads from GlotPress translations via the WordPress REST API.",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "HelgaTheViking\\GPLanguagePack\\Server\\": "includes/"
+    }
+  },
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+    "brianhenryie/strauss": "^0.27.0",
+    "woocommerce/woocommerce-sniffs": "*",
+    "wp-cli/i18n-command": "*"
+  },
+  "scripts": {
+    "makepot": [
+      "wp i18n make-pot . languages/gp-language-pack-server.pot --slug=gp-language-pack-server --domain=gp-language-pack-server --exclude=vendor,node_modules,client,tests,deploy,bin"
+    ],
+    "makepot-audit": [
+      "wp i18n audit . --domain=gp-language-pack-server"
+    ],
+    "prefix-namespaces": [
+      "strauss",
+      "@php composer dump-autoload"
+    ],
+    "post-install-cmd": [
+      "@prefix-namespaces"
+    ],
+    "post-update-cmd": [
+      "@prefix-namespaces"
+    ],
+    "post-autoload-dump": [
+      "strauss include-autoloader"
+    ]
+  },
+  "extra": {
+    "scripts-description": {
+      "makepot": "Generate a .pot file for translation",
+      "makepot-audit": "Generate a .pot file for translation. Dry run.",
+      "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+      "phpcb": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
+      "prefix-namespaces": "Prefix namespaces of dependencies with Strauss"
+    },
+    "strauss": {
+      "target_directory": "packages",
+      "namespace_prefix": "HelgaTheViking\\GPLanguagePack\\Server\\Vendor",
+      "classmap_prefix": "HelgaTheViking_GP_Language_Pack_Server_Vendor_",
+      "constant_prefix": "HTVGPLP_"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "8.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

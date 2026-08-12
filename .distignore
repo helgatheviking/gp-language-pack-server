@@ -1,0 +1,13 @@
+/.git
+/.github
+/node_modules
+/deploy
+/package.json
+/package-lock.json
+/.distignore
+/composer.json
+/composer.lock
+/.gitignore
+/.gitattributes
+/README.md
+/client
