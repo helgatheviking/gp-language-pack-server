@@ -5,14 +5,17 @@
   "main": "gp-language-pack-server.php",
   "scripts": {
     "make-pot": "composer makepot",
-    "release": "npm run make-pot && wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/",
-    "betarelease": "npm run make-pot && wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/"
+    "zip": "wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/",
+    "release": "npm run make-pot && npm run zip",
+    "betarelease": "npm run make-pot && npm run zip"
   },
   "files": [
     "gp-language-pack-server.php",
     "includes/",
     "languages/",
-    "README.md"
+    "README.md",
+    "vendor/",
+    "packages/"
   ],
   "devDependencies": {
     "@wordpress/scripts": "^34.1.0"

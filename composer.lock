@@ -4,8 +4,66 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93341c1b0edaaaacd5bce422b3e8b049",
-    "packages": [],
+    "content-hash": "f5f22972adba482753285840922cf867",
+    "packages": [
+        {
+            "name": "afragen/git-updater-lite",
+            "version": "3.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/afragen/git-updater-lite.git",
+                "reference": "e93c6ed33c50a4cfa11bda3dc68ba20d38c352fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/afragen/git-updater-lite/zipball/e93c6ed33c50a4cfa11bda3dc68ba20d38c352fd",
+                "reference": "e93c6ed33c50a4cfa11bda3dc68ba20d38c352fd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "wp-coding-standards/wpcs": "^3",
+                "yoast/phpunit-polyfills": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "Lite.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andy Fragen",
+                    "email": "andy@thefragens.com",
+                    "homepage": "https://github.com/afragen/git-updater-lite",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple class to integrate with Git Updater for standalone plugin/theme updates.",
+            "keywords": [
+                "package",
+                "updater",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/afragen/git-updater-lite/issues",
+                "source": "https://github.com/afragen/git-updater-lite/tree/3.0.4"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/afragen",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-05T23:26:19+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "brianhenryie/simple-php-code-parser",
