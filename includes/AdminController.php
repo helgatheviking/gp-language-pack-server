@@ -179,183 +179,90 @@ class AdminController {
 
 		?>
 		<style>
-			@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
 			.gp-lp-wrap {
-				font-family: 'Outfit', sans-serif;
-				margin: 20px 20px 0 0;
-				max-width: 1200px;
-			}
-			.gp-lp-header {
-				background: linear-gradient(135deg, hsl(250, 70%, 55%) 0%, hsl(280, 70%, 50%) 100%);
-				color: #fff;
-				padding: 30px 40px;
-				border-radius: 12px 12px 0 0;
-				box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-			.gp-lp-title h1 {
-				color: #fff;
-				font-size: 28px;
-				font-weight: 700;
-				margin: 0 0 5px 0;
-				line-height: 1.2;
-				text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-			}
-			.gp-lp-title p {
-				margin: 0;
-				opacity: 0.85;
-				font-size: 14px;
-				font-weight: 300;
-			}
-			.gp-lp-tabs {
-				background: #fff;
-				border-bottom: 1px solid #e5e7eb;
-				display: flex;
-				padding: 0 20px;
-				box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-			}
-			.gp-lp-tab {
-				padding: 18px 24px;
-				font-size: 15px;
-				font-weight: 500;
-				color: #4b5563;
-				text-decoration: none;
-				border-bottom: 3px solid transparent;
-				transition: all 0.2s ease;
-				cursor: pointer;
-			}
-			.gp-lp-tab:hover {
-				color: hsl(250, 70%, 55%);
-			}
-			.gp-lp-tab.active {
-				color: hsl(250, 70%, 55%);
-				border-bottom-color: hsl(250, 70%, 55%);
+				margin-top: 20px;
 			}
 			.gp-lp-content-panel {
 				display: none;
-				background: #fff;
-				padding: 35px 40px;
-				border-radius: 0 0 12px 12px;
-				box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+				margin-top: 20px;
 			}
 			.gp-lp-content-panel.active {
 				display: block;
-				animation: fadeIn 0.35s ease;
-			}
-			@keyframes fadeIn {
-				from { opacity: 0; transform: translateY(5px); }
-				to { opacity: 1; transform: translateY(0); }
 			}
 			/* Grid metrics */
 			.gp-lp-metrics {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+				display: flex;
+				flex-wrap: wrap;
 				gap: 20px;
-				margin-bottom: 35px;
+				margin: 20px 0 30px;
 			}
 			.gp-lp-card {
-				background: linear-gradient(145deg, #ffffff, #fcfdff);
-				border: 1px solid #eef2f7;
-				padding: 24px;
-				border-radius: 12px;
-				box-shadow: 0 4px 6px rgba(0,0,0,0.01);
-				display: flex;
-				flex-direction: column;
+				background: #fff;
+				border: 1px solid #c3c4c7;
+				padding: 15px 20px;
+				box-shadow: 0 1px 1px rgba(0,0,0,.04);
+				min-width: 180px;
+				flex: 1;
+				max-width: 250px;
 			}
 			.gp-lp-card-title {
-				font-size: 13px;
-				text-transform: uppercase;
-				color: #6b7280;
-				letter-spacing: 0.05em;
-				margin-bottom: 8px;
+				font-size: 11px;
+				color: #64748b;
+				display: block;
+				margin-bottom: 5px;
 				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
 			}
 			.gp-lp-card-value {
-				font-size: 26px;
-				font-weight: 700;
-				color: #111827;
-			}
-			/* Table Styling */
-			.gp-lp-table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-top: 10px;
-			}
-			.gp-lp-table th {
-				text-align: left;
-				padding: 14px 18px;
-				background: #f8fafc;
-				color: #475569;
+				font-size: 24px;
 				font-weight: 600;
-				font-size: 13px;
-				border-bottom: 2px solid #e2e8f0;
+				color: #1d2327;
 			}
-			.gp-lp-table td {
-				padding: 16px 18px;
-				border-bottom: 1px solid #f1f5f9;
-				vertical-align: middle;
-				font-size: 14px;
-				color: #334155;
-			}
-			.gp-lp-project-row {
-				background-color: #fbfcfe;
-				cursor: pointer;
-				transition: background-color 0.2s ease;
-			}
-			.gp-lp-project-row:hover {
-				background-color: #f3f6fc;
-			}
+			/* Table Styling & Interactions */
 			.gp-lp-project-name {
 				font-weight: 600;
-				color: #1e293b;
-				display: flex;
+				display: inline-flex;
 				align-items: center;
-				gap: 10px;
+				gap: 8px;
 			}
 			.gp-lp-project-arrow {
-				transition: transform 0.2s ease;
-				display: inline-block;
-				font-size: 11px;
-				color: #94a3b8;
+				transition: transform 0.15s ease-in-out;
+				color: #8c8f94;
 			}
 			.gp-lp-project-row.expanded .gp-lp-project-arrow {
 				transform: rotate(90deg);
 			}
-			.gp-lp-sets-row {
-				display: none;
-				background-color: #fff;
-			}
 			.gp-lp-sets-container {
-				padding: 10px 20px 25px 40px;
+				padding: 10px 20px 20px 40px;
 			}
 			/* Badges */
 			.gp-lp-badge {
-				display: inline-flex;
-				align-items: center;
-				padding: 4px 10px;
-				border-radius: 9999px;
-				font-size: 12px;
+				display: inline-block;
+				padding: 2px 8px;
+				border-radius: 3px;
+				font-size: 11px;
 				font-weight: 500;
-				gap: 5px;
 			}
 			.gp-lp-badge-active {
-				background-color: #ecfdf5;
-				color: #059669;
+				background-color: #f0f0f1;
+				color: #2c3338;
+				border: 1px solid #dcdcde;
 			}
 			.gp-lp-badge-generated {
-				background-color: #eff6ff;
-				color: #2563eb;
+				background-color: #d1e7dd;
+				color: #0f5132;
+				border: 1px solid #badbcc;
 			}
 			.gp-lp-badge-needs-update {
-				background-color: #fffbeb;
-				color: #d97706;
+				background-color: #fff3cd;
+				color: #664d03;
+				border: 1px solid #ffecb5;
 			}
 			.gp-lp-badge-missing {
-				background-color: #f3f4f6;
-				color: #6b7280;
+				background-color: #f8d7da;
+				color: #842029;
+				border: 1px solid #f5c2c7;
 			}
 			/* Progress bar */
 			.gp-lp-progress-container {
@@ -365,169 +272,45 @@ class AdminController {
 			}
 			.gp-lp-progress-bar {
 				flex: 1;
-				background-color: #e2e8f0;
-				height: 6px;
-				border-radius: 3px;
+				background-color: #dcdcde;
+				height: 8px;
+				border-radius: 4px;
 				overflow: hidden;
-				min-width: 100px;
+				max-width: 120px;
 			}
 			.gp-lp-progress-fill {
-				background: linear-gradient(90deg, hsl(250, 70%, 55%), hsl(280, 70%, 50%));
+				background-color: #2271b1;
 				height: 100%;
-				border-radius: 3px;
 				transition: width 0.3s ease;
 			}
-			/* Buttons */
-			.gp-lp-btn {
-				background-color: #fff;
-				border: 1px solid #cbd5e1;
-				color: #334155;
-				padding: 6px 12px;
-				border-radius: 6px;
-				cursor: pointer;
-				font-weight: 500;
-				font-size: 12px;
-				transition: all 0.2s ease;
-				display: inline-flex;
-				align-items: center;
-				gap: 5px;
+			/* Delete button standard style */
+			.btn-delete {
+				color: #b32d2e !important;
+				border-color: #b32d2e !important;
 			}
-			.gp-lp-btn:hover {
-				border-color: hsl(250, 70%, 55%);
-				color: hsl(250, 70%, 55%);
-				box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+			.btn-delete:hover {
+				background: #fcf0f1 !important;
+				color: #b32d2e !important;
 			}
-			.gp-lp-btn-primary {
-				background: hsl(250, 70%, 55%);
-				border-color: hsl(250, 70%, 55%);
-				color: #fff;
+			.btn-delete:focus {
+				box-shadow: 0 0 0 1px #b32d2e !important;
 			}
-			.gp-lp-btn-primary:hover {
-				background: hsl(250, 70%, 50%);
-				border-color: hsl(250, 70%, 50%);
-				color: #fff;
-			}
-			.gp-lp-btn-danger {
-				color: #dc2626;
-			}
-			.gp-lp-btn-danger:hover {
-				background-color: #fef2f2;
-				border-color: #fca5a5;
-				color: #dc2626;
-			}
-			.gp-lp-btn:disabled {
-				opacity: 0.5;
-				cursor: not-allowed;
-			}
-			/* Forms */
-			.gp-lp-form-row {
-				margin-bottom: 25px;
-			}
-			.gp-lp-form-row label {
-				display: block;
-				font-weight: 600;
-				color: #1e293b;
-				margin-bottom: 8px;
-				font-size: 15px;
-			}
-			.gp-lp-form-row input[type="number"] {
-				padding: 10px 14px;
-				border: 1px solid #cbd5e1;
-				border-radius: 8px;
-				font-size: 15px;
-				width: 120px;
-				outline: none;
-				transition: border-color 0.2s;
-			}
-			.gp-lp-form-row input[type="number"]:focus {
-				border-color: hsl(250, 70%, 55%);
-				box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-			}
-			.gp-lp-form-help {
-				font-size: 13px;
-				color: #64748b;
-				margin-top: 6px;
-				line-height: 1.4;
-			}
-			/* Code area */
-			.gp-lp-code-container {
-				position: relative;
-				margin-top: 15px;
-			}
-			.gp-lp-code {
-				background: #0f172a;
-				color: #e2e8f0;
-				padding: 24px;
-				border-radius: 8px;
-				font-family: 'Fira Code', 'Courier New', Courier, monospace;
-				font-size: 13px;
-				line-height: 1.5;
-				overflow-x: auto;
-				margin: 0;
-			}
-			.gp-lp-copy-btn {
-				position: absolute;
-				top: 12px;
-				right: 12px;
-				background: rgba(255,255,255,0.1);
-				border: none;
-				color: #fff;
-				padding: 6px 12px;
-				border-radius: 4px;
-				font-size: 11px;
-				cursor: pointer;
-				transition: background 0.2s;
-			}
-			.gp-lp-copy-btn:hover {
-				background: rgba(255,255,255,0.2);
-			}
-			.gp-lp-doc-block {
-				margin-bottom: 35px;
-				border-bottom: 1px solid #f1f5f9;
-				padding-bottom: 25px;
-			}
-			.gp-lp-doc-block:last-child {
-				border-bottom: none;
-				padding-bottom: 0;
-			}
-			.gp-lp-doc-block h3 {
-				font-size: 18px;
-				font-weight: 600;
-				color: #0f172a;
-				margin-top: 0;
-				margin-bottom: 10px;
-			}
-			.gp-lp-doc-block p {
-				color: #475569;
-				line-height: 1.5;
-				margin: 0 0 15px 0;
-			}
-			.gp-lp-alert {
-				background-color: #f8fafc;
-				border-left: 4px solid hsl(250, 70%, 55%);
-				padding: 15px 20px;
-				border-radius: 0 8px 8px 0;
-				margin-bottom: 20px;
-				font-size: 14px;
-				line-height: 1.5;
-				color: #475569;
+			.btn-delete:disabled {
+				color: #a7aaad !important;
+				border-color: #dcdcde !important;
+				background: #f6f7f7 !important;
 			}
 		</style>
 
-		<div class="gp-lp-wrap">
-			<!-- Header -->
-			<div class="gp-lp-header">
-				<div class="gp-lp-title">
-					<h1><?php esc_html_e( 'Language Pack Server for GlotPress', 'gp-language-pack-server' ); ?></h1>
-					<p><?php esc_html_e( 'Manage language pack builds and client delivery', 'gp-language-pack-server' ); ?></p>
-				</div>
-			</div>
+		<div class="wrap gp-lp-wrap">
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Language Pack Server for GlotPress', 'gp-language-pack-server' ); ?></h1>
+			<hr class="wp-header-end">
 
 			<!-- Tabs -->
-			<div class="gp-lp-tabs">
-				<div class="gp-lp-tab active" data-target="panel-dashboard"><?php esc_html_e( 'Dashboard', 'gp-language-pack-server' ); ?></div>
-				<div class="gp-lp-tab" data-target="panel-settings"><?php esc_html_e( 'Settings', 'gp-language-pack-server' ); ?></div>
-			</div>
+			<nav class="nav-tab-wrapper wp-clearfix" style="margin-bottom: 20px;">
+				<a href="#dashboard" class="nav-tab nav-tab-active" data-target="panel-dashboard"><?php esc_html_e( 'Dashboard', 'gp-language-pack-server' ); ?></a>
+				<a href="#settings" class="nav-tab" data-target="panel-settings"><?php esc_html_e( 'Settings', 'gp-language-pack-server' ); ?></a>
+			</nav>
 
 			<!-- Dashboard Panel -->
 			<div id="panel-dashboard" class="gp-lp-content-panel active">
@@ -548,11 +331,11 @@ class AdminController {
 				</div>
 
 				<?php if ( empty( $projects ) ) : ?>
-					<div class="gp-lp-alert">
-						<?php esc_html_e( 'No active GlotPress projects found. Make sure you create and activate projects in GlotPress first.', 'gp-language-pack-server' ); ?>
+					<div class="notice notice-warning inline">
+						<p><?php esc_html_e( 'No active GlotPress projects found. Make sure you create and activate projects in GlotPress first.', 'gp-language-pack-server' ); ?></p>
 					</div>
 				<?php else : ?>
-					<table class="gp-lp-table">
+					<table class="widefat striped">
 						<thead>
 							<tr>
 								<th><?php esc_html_e( 'Project Name', 'gp-language-pack-server' ); ?></th>
@@ -565,23 +348,23 @@ class AdminController {
 								<?php
 								$sets = GP::$translation_set->by_project_id( $project->id );
 								?>
-								<tr class="gp-lp-project-row" data-project-id="<?php echo esc_attr( $project->id ); ?>">
+								<tr class="gp-lp-project-row" data-project-id="<?php echo esc_attr( $project->id ); ?>" style="cursor: pointer;">
 									<td>
 										<span class="gp-lp-project-name">
-											<span class="gp-lp-project-arrow">▶</span>
-											<?php echo esc_html( $project->name ); ?>
+											<span class="dashicons dashicons-arrow-right-alt2 gp-lp-project-arrow"></span>
+											<strong><?php echo esc_html( $project->name ); ?></strong>
 										</span>
 									</td>
 									<td><code><?php echo esc_html( $project->path ); ?></code></td>
 									<td><span class="gp-lp-badge gp-lp-badge-active"><?php echo count( $sets ); ?> Sets</span></td>
 								</tr>
-								<tr class="gp-lp-sets-row" id="sets-row-<?php echo esc_attr( $project->id ); ?>">
+								<tr class="gp-lp-sets-row" id="sets-row-<?php echo esc_attr( $project->id ); ?>" style="display: none;">
 									<td colspan="3">
 										<div class="gp-lp-sets-container">
 											<?php if ( empty( $sets ) ) : ?>
-												<p class="gp-lp-form-help"><?php esc_html_e( 'No translation sets exist for this project yet.', 'gp-language-pack-server' ); ?></p>
+												<p class="description"><?php esc_html_e( 'No translation sets exist for this project yet.', 'gp-language-pack-server' ); ?></p>
 											<?php else : ?>
-												<table class="gp-lp-table" style="background:#fff; border: 1px solid #f1f5f9;">
+												<table class="widefat" style="border: 1px solid #c3c4c7;">
 													<thead>
 														<tr>
 															<th><?php esc_html_e( 'Locale (WP)', 'gp-language-pack-server' ); ?></th>
@@ -643,12 +426,12 @@ class AdminController {
 																	<br><span class="meta-date" style="font-size:11px; color:#64748b;"><?php echo esc_html( $date_info ); ?></span>
 																</td>
 																<td style="text-align: right;">
-																	<button class="gp-lp-btn gp-lp-btn-primary btn-generate" 
+																	<button class="button button-primary btn-generate" 
 																			data-project-id="<?php echo esc_attr( $project->id ); ?>" 
 																			data-set-id="<?php echo esc_attr( $set->id ); ?>">
 																		<?php esc_html_e( 'Build ZIP', 'gp-language-pack-server' ); ?>
 																	</button>
-																	<button class="gp-lp-btn gp-lp-btn-danger btn-delete" 
+																	<button class="button btn-delete" 
 																			data-project-id="<?php echo esc_attr( $project->id ); ?>" 
 																			data-set-id="<?php echo esc_attr( $set->id ); ?>"
 																			<?php echo ! $exists ? 'disabled' : ''; ?>>
@@ -674,45 +457,48 @@ class AdminController {
 				<form method="post" action="options.php">
 					<?php settings_fields( 'gp_language_pack_settings' ); ?>
 
-					<div class="gp-lp-form-row">
-						<label for="gp_language_pack_threshold"><?php esc_html_e( 'Translation Progress Threshold', 'gp-language-pack-server' ); ?></label>
-						<input type="number" id="gp_language_pack_threshold" name="gp_language_pack_threshold" 
-							   value="<?php echo esc_attr( $threshold ); ?>" min="0" max="100" />
-						<p class="gp-lp-form-help">
-							<?php esc_html_e( 'Minimum translation percentage required for a language pack to be generated and served. Packs below this threshold will not be sent to clients.', 'gp-language-pack-server' ); ?>
-						</p>
-					</div>
+					<table class="form-table" role="presentation">
+						<tbody>
+							<tr>
+								<th scope="row">
+									<label for="gp_language_pack_threshold"><?php esc_html_e( 'Translation Progress Threshold', 'gp-language-pack-server' ); ?></label>
+								</th>
+								<td>
+									<input type="number" id="gp_language_pack_threshold" name="gp_language_pack_threshold" 
+										   value="<?php echo esc_attr( $threshold ); ?>" min="0" max="100" class="small-text" />
+									<p class="description">
+										<?php esc_html_e( 'Minimum translation percentage required for a language pack to be generated and served. Packs below this threshold will not be sent to clients.', 'gp-language-pack-server' ); ?>
+									</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 
-					<?php submit_button( __( 'Save Control Settings', 'gp-language-pack-server' ), 'primary gp-lp-btn gp-lp-btn-primary' ); ?>
+					<?php submit_button( __( 'Save Control Settings', 'gp-language-pack-server' ) ); ?>
 				</form>
 			</div>
 
-			</div>
+		</div>
 
 		<!-- Script Logic -->
 		<script>
-			function gpLPCopyCode(btn) {
-				const container = btn.closest('.gp-lp-code-container');
-				const code = container.querySelector('.gp-lp-code').innerText;
-				navigator.clipboard.writeText(code).then(() => {
-					const oldText = btn.innerText;
-					btn.innerText = '<?php esc_attr_e( 'Copied!', 'gp-language-pack-server' ); ?>';
-					setTimeout(() => btn.innerText = oldText, 2000);
-				});
-			}
-
 			document.addEventListener('DOMContentLoaded', function() {
 				// Tabs functionality
-				const tabs = document.querySelectorAll('.gp-lp-tab');
+				const tabs = document.querySelectorAll('.nav-tab');
 				const panels = document.querySelectorAll('.gp-lp-content-panel');
 
 				tabs.forEach(tab => {
-					tab.addEventListener('click', function() {
-						tabs.forEach(t => t.classList.remove('active'));
+					tab.addEventListener('click', function(e) {
+						e.preventDefault();
+						tabs.forEach(t => t.classList.remove('nav-tab-active'));
 						panels.forEach(p => p.classList.remove('active'));
 
-						this.classList.add('active');
-						document.getElementById(this.dataset.target).classList.add('active');
+						this.classList.add('nav-tab-active');
+						const targetId = this.dataset.target;
+						const targetPanel = document.getElementById(targetId);
+						if (targetPanel) {
+							targetPanel.classList.add('active');
+						}
 					});
 				});
 
@@ -831,3 +617,4 @@ class AdminController {
 		<?php
 	}
 }
+
