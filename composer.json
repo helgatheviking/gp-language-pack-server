@@ -14,8 +14,8 @@
   },
   "require-dev": {
     "brianhenryie/strauss": "^0.27.0",
-    "woocommerce/woocommerce-sniffs": "*",
-    "wp-cli/i18n-command": "*"
+    "wp-cli/i18n-command": "*",
+    "wp-coding-standards/wpcs": "^3.0"
   },
   "scripts": {
     "makepot": [
@@ -23,6 +23,12 @@
     ],
     "makepot-audit": [
       "wp i18n audit . --domain=gp-language-pack-server"
+    ],
+    "lint": [
+      "phpcs . -s -p -n"
+    ],
+    "lint:fix": [
+      "phpcbf . "
     ],
     "prefix-namespaces": [
       "strauss",
