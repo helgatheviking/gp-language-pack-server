@@ -316,7 +316,7 @@ class LanguagePackGenerator {
 			);
 		}
 
-		$po_string = $po_format->print_exported_file( $project, $set, $locale, $translations );
+		$po_string = $po_format->print_exported_file( $project, $locale, $set, $translations );
 		if ( ! $po_string ) {
 			return new WP_Error(
 				'gp_language_pack_export_failed',
@@ -582,8 +582,22 @@ class LanguagePackGenerator {
 				continue;
 			}
 
-			// References can be separated by spaces, newlines, or commas.
-			$refs = preg_split( '/[\s,]+/', $translation->references );
+			// References can be separated by spaces, newlines, or commas (string) or already parsed as an array.
+			$raw_refs = $translation->references;
+			$refs     = array();
+			if ( is_string( $raw_refs ) ) {
+				$refs = preg_split( '/[\s,]+/', $raw_refs );
+			} elseif ( is_array( $raw_refs ) ) {
+				foreach ( $raw_refs as $r ) {
+					if ( is_string( $r ) ) {
+						$split = preg_split( '/[\s,]+/', $r );
+						if ( is_array( $split ) ) {
+							$refs = array_merge( $refs, $split );
+						}
+					}
+				}
+			}
+
 			foreach ( $refs as $ref ) {
 				$ref = trim( $ref );
 				if ( empty( $ref ) ) {
