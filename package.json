@@ -1,6 +1,6 @@
 {
   "name": "gp-language-pack-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generates and serves language pack downloads from GlotPress translations via the WordPress REST API.",
   "main": "gp-language-pack-server.php",
   "scripts": {

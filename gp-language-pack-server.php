@@ -3,7 +3,7 @@
  * Plugin Name: Language Pack Server for GlotPress
  * Plugin URI:  https://github.com/helgatheviking/gp-language-pack-server
  * Description: Generates and serves language pack downloads from GlotPress translations via the WordPress REST API.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      helgatheviking
  * Author URI:  https://www.kathyisawesome.com
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -130,7 +130,7 @@ function gp_language_pack_init(): void {
 		return;
 	}
 
-	define( 'gp_language_pack_VERSION', '1.0.0' );
+	define( 'gp_language_pack_VERSION', '1.0.1' );
 	define( 'gp_language_pack_PATH', plugin_dir_path( __FILE__ ) );
 	define( 'gp_language_pack_URL', plugin_dir_url( __FILE__ ) );
 
