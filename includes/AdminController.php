@@ -41,10 +41,10 @@ class AdminController {
 	}
 
 	/**
-	 * Registers the admin menu item under Settings.
+	 * Registers the admin menu item under Tools.
 	 */
 	public function register_admin_menu(): void {
-		add_options_page(
+		add_management_page(
 			__( 'Language Pack Server for GlotPress', 'gp-language-pack-server' ),
 			__( 'Language Pack Server', 'gp-language-pack-server' ),
 			'manage_options',
@@ -369,8 +369,8 @@ class AdminController {
 														<tr>
 															<th><?php esc_html_e( 'Locale (WP)', 'gp-language-pack-server' ); ?></th>
 															<th><?php esc_html_e( 'Progress', 'gp-language-pack-server' ); ?></th>
-															<th><?php esc_html_e( 'ZIP Status', 'gp-language-pack-server' ); ?></th>
-															<th><?php esc_html_e( 'ZIP Metadata', 'gp-language-pack-server' ); ?></th>
+															<th><?php esc_html_e( 'Pack status', 'gp-language-pack-server' ); ?></th>
+															<th><?php esc_html_e( 'Pack Metadata', 'gp-language-pack-server' ); ?></th>
 															<th style="text-align: right;"><?php esc_html_e( 'Actions', 'gp-language-pack-server' ); ?></th>
 														</tr>
 													</thead>
@@ -429,7 +429,7 @@ class AdminController {
 																	<button class="button button-primary btn-generate" 
 																			data-project-id="<?php echo esc_attr( $project->id ); ?>" 
 																			data-set-id="<?php echo esc_attr( $set->id ); ?>">
-																		<?php esc_html_e( 'Build ZIP', 'gp-language-pack-server' ); ?>
+																		<?php esc_html_e( 'Regenerate language pack', 'gp-language-pack-server' ); ?>
 																	</button>
 																	<button class="button btn-delete" 
 																			data-project-id="<?php echo esc_attr( $project->id ); ?>" 
@@ -523,16 +523,16 @@ class AdminController {
 				const nonce = '<?php echo esc_js( wp_create_nonce( 'gp_language_pack_admin_nonce' ) ); ?>';
 				const ajaxUrl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
 
-				// Manual ZIP generation click
-				document.querySelectorAll('.btn-generate').forEach(btn => {
-					btn.addEventListener('click', function() {
-						const row = this.closest('tr');
-						const projId = this.dataset.projectId;
-						const setId = this.dataset.setId;
+				// Helper to generate a single pack via AJAX and return a Promise
+				function generatePack(btn) {
+					return new Promise((resolve, reject) => {
+						const row = btn.closest('tr');
+						const projId = btn.dataset.projectId;
+						const setId = btn.dataset.setId;
 
-						this.disabled = true;
-						const oldText = this.innerText;
-						this.innerText = '<?php esc_attr_e( 'Building...', 'gp-language-pack-server' ); ?>';
+						btn.disabled = true;
+						const oldText = btn.innerText;
+						btn.innerText = '<?php esc_attr_e( 'Generating...', 'gp-language-pack-server' ); ?>';
 
 						fetch(ajaxUrl, {
 							method: 'POST',
@@ -541,8 +541,8 @@ class AdminController {
 						})
 						.then(res => res.json())
 						.then(res => {
-							this.disabled = false;
-							this.innerText = oldText;
+							btn.disabled = false;
+							btn.innerText = oldText;
 
 							if (res.success) {
 								// Update status badge
@@ -553,15 +553,30 @@ class AdminController {
 								row.querySelector('.col-meta .meta-date').innerText = res.data.date;
 
 								// Enable delete button
-								row.querySelector('.btn-delete').removeAttribute('disabled');
+								const deleteBtn = row.querySelector('.btn-delete');
+								if (deleteBtn) {
+									deleteBtn.removeAttribute('disabled');
+								}
+								resolve(res.data);
 							} else {
-								alert('Error: ' + res.data.message);
+								resolve({ error: res.data.message });
 							}
 						})
 						.catch(err => {
-							this.disabled = false;
-							this.innerText = oldText;
-							alert('An unexpected error occurred.');
+							btn.disabled = false;
+							btn.innerText = oldText;
+							resolve({ error: 'An unexpected network error occurred.' });
+						});
+					});
+				}
+
+				// Manual ZIP generation click
+				document.querySelectorAll('.btn-generate').forEach(btn => {
+					btn.addEventListener('click', function() {
+						generatePack(btn).then(result => {
+							if (result.error) {
+								alert('Error: ' + result.error);
+							}
 						});
 					});
 				});
