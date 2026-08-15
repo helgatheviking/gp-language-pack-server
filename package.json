@@ -6,8 +6,9 @@
   "scripts": {
     "make-pot": "composer makepot",
     "zip": "wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/",
-    "release": "npm run make-pot && npm run zip",
-    "betarelease": "npm run make-pot && npm run zip"
+    "release": "npm run update-version && npm run make-pot && npm run zip",
+    "betarelease": "npm run update-version && npm run make-pot && npm run zip",
+    "update-version": "node bin/update-version.js"
   },
   "files": [
     "gp-language-pack-server.php",
