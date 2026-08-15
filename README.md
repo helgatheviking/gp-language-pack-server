@@ -88,3 +88,33 @@ if ( file_exists( __DIR__ . '/Client.php' ) ) {
 2.  **Locale Check:** Filters translation packages to match only the site's active languages (`get_locale()` and `get_available_languages()`).
 3.  **Modified Checking:** Inspects the file modification time (`filemtime`) of the local `.mo` file under `wp-content/languages/plugins/` (or `themes/`).
 4.  **Native Updates:** If the local file is missing or older than the server release, it injects the update directly into WordPress's core update transient. WordPress then natively presents the update under **Dashboard > Updates > Translations** and handles the download and extraction automatically.
+
+---
+
+## 4. WP-CLI Command
+
+The plugin registers a custom WP-CLI command to manually trigger, test, or schedule language pack generation from the command line.
+
+```bash
+wp gp-language-packs generate [options]
+```
+
+### Options
+* `--project=<slug>`: Limit generation to a single project slug. Omit to process all active projects.
+* `--locale=<wp_locale>`: Limit generation to a single WordPress locale (e.g. `es_ES`). Requires `--project` to be set.
+* `--threshold=<percent>`: Minimum percent translated required to generate a pack. Defaults to the threshold configured in the admin dashboard (default: `90`).
+
+### Examples
+```bash
+# Generate packs for all active projects that meet the default threshold.
+wp gp-language-packs generate
+
+# Generate packs only for a specific project.
+wp gp-language-packs generate --project=my-plugin
+
+# Generate only the Spanish pack for a specific project.
+wp gp-language-packs generate --project=my-plugin --locale=es_ES
+
+# Force generation for sets at 70% or more translated.
+wp gp-language-packs generate --threshold=70
+```
