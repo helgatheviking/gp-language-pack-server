@@ -91,7 +91,7 @@ new GPLanguagePackClient(
 if ( file_exists( __DIR__ . '/Client.php' ) ) {
 	require_once __DIR__ . '/Client.php';
 	
-	new \HelgaTheViking\GPLanguagePack\Client\Client(
+	new \HelgaTheViking\GPLanguagePack\Client(
 		'https://your-server.com',
 		'your-project-slug',
 		'your-textdomain',
