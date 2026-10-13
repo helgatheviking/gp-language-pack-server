@@ -29,6 +29,8 @@ use WP_REST_Server;
  * Language packs REST controller.
  *
  * Extends WP_REST_Controller directly — zero dependency on any GP REST patch.
+ *
+ * @version 1.0.3
  */
 class RestController extends WP_REST_Controller {
 
@@ -241,11 +243,20 @@ class RestController extends WP_REST_Controller {
 		$path = trim( $path, '/' );
 
 		global $wpdb;
+
+		// Path wins over ID. Only fall back to an ID when the whole value is numeric:
+		// casting "2fa-plugin" with (int) would otherwise resolve to project 2.
 		$project = GP::$project->one(
-			"SELECT * FROM {$wpdb->prefix}gp_projects WHERE path = %s OR id = %d",
-			$path,
-			(int) $raw
+			"SELECT * FROM {$wpdb->prefix}gp_projects WHERE path = %s",
+			$path
 		);
+
+		if ( ! $project instanceof GP_Project && '' !== $raw && ctype_digit( $raw ) ) {
+			$project = GP::$project->one(
+				"SELECT * FROM {$wpdb->prefix}gp_projects WHERE id = %d",
+				(int) $raw
+			);
+		}
 
 		if ( ! $project instanceof GP_Project ) {
 			$error = new WP_Error(

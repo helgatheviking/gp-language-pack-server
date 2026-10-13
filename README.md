@@ -22,20 +22,37 @@ A WordPress plugin that transforms a site running **GlotPress** into a language 
 
 ---
 
-## 2. Automatic POT Upload (GitHub Actions)
+## 2. Automatic POT Upload
 
-Add this workflow step to your premium plugin repository to automatically sync translation keys when a new template file is built:
+`POST .../projects/{project-slug}/import` with a multipart `file` (`.pot` or `.po`).
 
-```yaml
-- name: Upload POT to GlotPress
-  run: |
-    curl -X POST -u "wp_admin_username:application_password" \
-      -F "file=@languages/my-plugin.pot" \
-      "https://your-server.com/wp-json/gp-language-pack-server/v1/projects/your-project-slug/import"
+| Parameter  | Default | Meaning |
+|------------|---------|---------|
+| `additive` | `0`     | Only add and update strings. Nothing is obsoleted or fuzzied. Use for pre-release templates. |
+| `force`    | `0`     | Allow a full sync that would obsolete more than half of the existing strings (rejected by default as a likely bad file). |
+
+```bash
+curl -X POST -u "import_bot:application_password" \
+  -F "file=@languages/my-plugin.pot" \
+  "https://your-server.com/wp-json/gp-language-pack-server/v1/projects/your-project-slug/import"
 ```
 
-> [!NOTE]
-> Generate WordPress Application Passwords inside the user profile page of a WordPress account with write privileges to the target GlotPress project.
+Pass the credentials from a secret, never inline in a shared script. See your plugin's `upload-pot` Grunt task for a Node version that keeps them out of argv.
+
+### Pre-release strings
+
+Language packs are keyed by locale, not plugin version, so every site gets the same pack. That shapes the workflow:
+
+*   **Pre-release builds (alpha/beta/rc):** import with `additive=1`. New strings appear for translators right away; strings still used by the stable release are never obsoleted or fuzzied, so stable sites don't lose translations.
+*   **Stable release:** import without `additive`. This is the full sync that obsoletes strings that really were removed.
+*   Beta-only strings that never ship are harmless; the stable sync obsoletes them.
+*   New untranslated strings lower each locale's percent translated. A locale that drops below the pack threshold stops being offered updates (sites keep the pack they have), so lower the threshold or import pre-release strings only when translators have time to catch up.
+
+### Securing the endpoint
+
+*   Create a **dedicated WordPress user** for imports (not an administrator) and grant it GlotPress `write` permission on that one project. Authenticate with an Application Password over HTTPS.
+*   The endpoint requires authentication before any project lookup, answers unknown and forbidden projects identically, accepts only `.po`/`.pot` files up to 5 MB and 20,000 strings (filters `gp_language_pack_max_import_bytes`, `gp_language_pack_max_import_entries`), reads only files PHP received in the request, and allows one import per project at a time.
+*   Full-sync imports that are empty, or would obsolete more than half of a project's strings, are rejected unless `force=1`. This guards against mistakes; it is not a defence against a credential that already has write access.
 
 ---
 
@@ -86,7 +103,7 @@ if ( file_exists( __DIR__ . '/Client.php' ) ) {
 ### How the Client Works:
 1.  **Transient Cache:** Queries your GlotPress server and caches the response locally for **12 hours** to keep client sites fast and lightweight.
 2.  **Locale Check:** Filters translation packages to match only the site's active languages (`get_locale()` and `get_available_languages()`).
-3.  **Modified Checking:** Inspects the file modification time (`filemtime`) of the local `.mo` file under `wp-content/languages/plugins/` (or `themes/`).
+3.  **Modified Checking:** Inspects the file modification time (`filemtime`) of the local `.mo` file under `wp-content/languages/plugins/` (or `themes/`). The client also records an md5 of each `.mo` it installs, and skips any locale whose local file has been edited since, so hand edits are never overwritten.
 4.  **Native Updates:** If the local file is missing or older than the server release, it injects the update directly into WordPress's core update transient. WordPress then natively presents the update under **Dashboard > Updates > Translations** and handles the download and extraction automatically.
 
 ---
