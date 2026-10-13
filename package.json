@@ -6,9 +6,10 @@
   "scripts": {
     "make-pot": "composer makepot",
     "zip": "wp-scripts plugin-zip && mkdir -p deploy && mv gp-language-pack-server.zip deploy/",
-    "release": "npm run update-version && npm run make-pot && npm run zip",
-    "betarelease": "npm run update-version && npm run make-pot && npm run zip",
-    "update-version": "node bin/update-version.js"
+    "release": "npm run update-version && npm run build",
+    "betarelease": "npm run update-version && npm run build",
+    "update-version": "node bin/update-version.js",
+    "build": "composer install --no-interaction && npm run make-pot && composer install --no-dev --optimize-autoloader --no-interaction && npm run zip && composer install --no-interaction"
   },
   "files": [
     "gp-language-pack-server.php",
@@ -16,7 +17,7 @@
     "languages/",
     "README.md",
     "vendor/",
-    "packages/"
+    "vendor-prefixed/"
   ],
   "devDependencies": {
     "@wordpress/scripts": "^34.1.0"

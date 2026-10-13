@@ -1,7 +1,7 @@
 # Dependencies
 /node_modules/
 /vendor/
-/packages/
+/vendor-prefixed/
 
 # Build and Release artifacts
 /deploy/
@@ -29,3 +29,4 @@ yarn-error.log*
 
 # Other files
 /client/
+/bin/strauss.phar

@@ -35,8 +35,8 @@ use HelgaTheViking\GPLanguagePack\Server\Vendor\Fragen;
 /**
   * Add Git Updater Lite
   */
-if ( file_exists( __DIR__ . '/packages/autoload.php' ) ) {
-	require_once __DIR__ . '/packages/autoload.php';
+if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor-prefixed/autoload.php';
 
 	if ( class_exists( Fragen\Git_Updater\Lite::class ) ) {
 		( new Fragen\Git_Updater\Lite( __FILE__ ) )->run();

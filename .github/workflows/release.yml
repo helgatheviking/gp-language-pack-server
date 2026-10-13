@@ -86,7 +86,18 @@ jobs:
 
       - name: "Clean up dev dependencies."
         run: |
-          composer install --no-dev --no-interaction --prefer-dist --no-scripts --optimize-autoloader
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: "Verify prefixed packages."
+        run: |
+          if [ ! -f ./vendor-prefixed/autoload.php ]; then
+            echo "::error::vendor-prefixed/autoload.php missing. Strauss did not run."
+            exit 1
+          fi
+          if [ -d ./vendor/afragen ]; then
+            echo "::error::Unprefixed dependencies found in vendor/."
+            exit 1
+          fi
 
       - name: "Setup NodeJS."
         uses: actions/setup-node@v6

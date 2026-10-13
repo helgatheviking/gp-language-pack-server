@@ -13,9 +13,9 @@
     "afragen/git-updater-lite": "^3.0"
   },
   "require-dev": {
-    "brianhenryie/strauss": "^0.27.0",
     "wp-cli/i18n-command": "*",
-    "wp-coding-standards/wpcs": "^3.0"
+    "wp-coding-standards/wpcs": "^3.0",
+    "phpcompatibility/phpcompatibility-wp": "^2.1"
   },
   "scripts": {
     "makepot": [
@@ -31,17 +31,15 @@
       "phpcbf . "
     ],
     "prefix-namespaces": [
-      "strauss",
-      "@php composer dump-autoload"
+      "sh -c 'test -f bin/strauss.phar || { mkdir -p bin && curl -fL -o bin/strauss.phar https://github.com/BrianHenryIE/strauss/releases/download/0.27.4/strauss.phar; }'",
+      "@php bin/strauss.phar",
+      "@composer dump-autoload"
     ],
     "post-install-cmd": [
       "@prefix-namespaces"
     ],
     "post-update-cmd": [
       "@prefix-namespaces"
-    ],
-    "post-autoload-dump": [
-      "strauss include-autoloader"
     ]
   },
   "extra": {
@@ -50,13 +48,14 @@
       "makepot-audit": "Generate a .pot file for translation. Dry run.",
       "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
       "phpcb": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
-      "prefix-namespaces": "Prefix namespaces of dependencies with Strauss"
+      "prefix-namespaces": "Prefix namespaces of dependencies with Strauss (downloads bin/strauss.phar if missing)"
     },
     "strauss": {
-      "target_directory": "packages",
+      "target_directory": "vendor-prefixed",
       "namespace_prefix": "HelgaTheViking\\GPLanguagePack\\Server\\Vendor",
       "classmap_prefix": "HelgaTheViking_GP_Language_Pack_Server_Vendor_",
-      "constant_prefix": "HTVGPLP_"
+      "constant_prefix": "HTVGPLP_",
+      "delete_vendor_packages": true
     }
   },
   "config": {
