@@ -20,6 +20,6 @@
     "vendor-prefixed/"
   ],
   "devDependencies": {
-    "@wordpress/scripts": "^34.1.0"
+    "@wordpress/scripts": "^37.0.0"
   }
 }
