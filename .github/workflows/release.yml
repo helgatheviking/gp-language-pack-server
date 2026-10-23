@@ -20,7 +20,8 @@ jobs:
   # - Get Composer Cache Directory.
   # - Sets up Composer Caching.
   # - Logs debug information.
-  # - Install Composer dependencies with development dependencies.
+  # - Install Composer dependencies (prefixed with Strauss).
+  # - Generate POT file.
   # - Setup NodeJS.
   # - Get NPM cache directory.
   # - Sets up NPM Caching.
@@ -80,17 +81,15 @@ jobs:
           php --version
           composer --version
 
+      # Production dependencies only; post-install-cmd runs Strauss to prefix them.
       - name: "Install Composer dependencies."
         run: |
-          composer install --no-interaction --prefer-dist --optimize-autoloader
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
+      # Uses the WP-CLI installed by setup-php, which bundles the i18n command.
       - name: "Generate POT file."
         run: |
           composer makepot
-
-      - name: "Clean up dev dependencies."
-        run: |
-          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
       - name: "Verify prefixed packages."
         run: |
