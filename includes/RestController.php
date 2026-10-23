@@ -150,7 +150,21 @@ class RestController extends WP_REST_Controller {
 		 */
 		$items = apply_filters( 'gp_language_pack_items', $items, $project );
 
-		return rest_ensure_response( $items );
+		$response = rest_ensure_response( $items );
+
+		/**
+		 * Filters how long, in seconds, CDNs and proxies may cache the pack list.
+		 *
+		 * Without an explicit header, edge caches can keep serving a list that
+		 * says `package: false` long after the zip has been built.
+		 *
+		 * @param int        $max_age
+		 * @param GP_Project $project
+		 */
+		$max_age = (int) apply_filters( 'gp_language_pack_api_max_age', 5 * MINUTE_IN_SECONDS, $project );
+		$response->header( 'Cache-Control', 'public, max-age=' . max( 0, $max_age ) );
+
+		return $response;
 	}
 
 	/**
