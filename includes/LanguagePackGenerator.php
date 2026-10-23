@@ -6,7 +6,8 @@
  * language pack: a zip containing {slug}-{wp_locale}.po and .mo files.
  *
  * Generation is triggered:
- *   - Automatically when a translation is approved (via `gp_translation_saved`).
+ *   - Automatically when a translation is approved (via `gp_translation_created`
+ *     for new translations and `gp_translation_saved` for updated ones).
  *     A 60-second deferred single event batches rapid successive approvals so
  *     a bulk import doesn't rebuild the zip on every individual string.
  *   - Via WP-CLI: `wp gp-language-packs generate [--project=<slug>] [--locale=<wp_locale>]`
@@ -59,6 +60,9 @@ class LanguagePackGenerator {
 	}
 
 	private function __construct() {
+		// New translations (including a validator's own, and imports) are created
+		// already approved and only fire `gp_translation_created`.
+		add_action( 'gp_translation_created', array( $this, 'on_translation_saved' ) );
 		add_action( 'gp_translation_saved', array( $this, 'on_translation_saved' ) );
 		add_action( self::SINGLE_EVENT_HOOK, array( $this, 'generate_by_ids' ), 10, 2 );
 		add_action( 'gp_language_pack_daily_generate', array( $this, 'generate_all_packs' ) );
@@ -73,7 +77,7 @@ class LanguagePackGenerator {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Fires when a translation is saved.
+	 * Fires when a translation is created or saved.
 	 *
 	 * Only acts on approved (current) translations. Schedules a one-off event
 	 * 60 seconds from now so rapid successive approvals during a bulk import
@@ -122,17 +126,28 @@ class LanguagePackGenerator {
 			return;
 		}
 
-		$result = self::generate( $project, $set );
+		self::log_if_error( self::generate( $project, $set ), $project, $set );
+	}
 
-		if ( is_wp_error( $result ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log( sprintf(
-				'[gp-language-packs] Failed to generate pack for %s / %s: %s',
-				$project->slug,
-				$set->locale,
-				$result->get_error_message()
-			) );
+	/**
+	 * Logs a failed generation result to the PHP error log.
+	 *
+	 * @param mixed              $result Return value of generate().
+	 * @param GP_Project         $project
+	 * @param GP_Translation_Set $set
+	 */
+	private static function log_if_error( $result, GP_Project $project, GP_Translation_Set $set ): void {
+		if ( ! is_wp_error( $result ) ) {
+			return;
 		}
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( sprintf(
+			'[gp-language-packs] Failed to generate pack for %s / %s: %s',
+			$project->slug,
+			$set->locale,
+			$result->get_error_message()
+		) );
 	}
 
 	// -------------------------------------------------------------------------
@@ -558,7 +573,7 @@ class LanguagePackGenerator {
 			$sets = GP::$translation_set->by_project_id( $project->id );
 			foreach ( $sets as $set ) {
 				if ( $set->percent_translated() >= $threshold ) {
-					self::generate( $project, $set );
+					self::log_if_error( self::generate( $project, $set ), $project, $set );
 				}
 			}
 		}

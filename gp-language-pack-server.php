@@ -63,6 +63,19 @@ function gp_language_pack_activate(): void {
 register_activation_hook( __FILE__, 'gp_language_pack_activate' );
 
 /**
+ * Ensures the daily generation event is scheduled.
+ *
+ * Activation only runs on a fresh activate, not when the plugin is updated in
+ * place, so re-check on every load and reschedule if the event is missing.
+ */
+function gp_language_pack_ensure_cron(): void {
+	if ( ! wp_next_scheduled( 'gp_language_pack_daily_generate' ) ) {
+		wp_schedule_event( time(), 'daily', 'gp_language_pack_daily_generate' );
+	}
+}
+add_action( 'init', 'gp_language_pack_ensure_cron' );
+
+/**
  * Runs on plugin deactivation.
  *
  * Clears the daily Cron generation event.
