@@ -30,6 +30,7 @@ jobs:
   # - Check for Beta release.
   # - Check for Release Candidate release.
   # - Logs debug information.
+  # - Build changelog from commits.
   # - Build release:
   #    - Pre-release.
   #    - Stable.
@@ -49,6 +50,9 @@ jobs:
 
       - name: "Checks out the repository."
         uses: "actions/checkout@v7"
+        with:
+          # Full history and tags, so we can find the previous tag.
+          fetch-depth: 0
 
       - name: "Sets up PHP with Composer."
         uses: shivammathur/setup-php@v2
@@ -150,6 +154,21 @@ jobs:
           echo ${{ env.release_tag }}
           echo ${{ env.release_status }}
 
+      # Release notes are the commit subjects since the previous tag, minus version bumps.
+      - name: "Build changelog from commits."
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          prev=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || true)
+          range="${prev:+$prev..}$TAG"
+          {
+            echo "## Changelog"
+            echo
+            git log "$range" --no-merges --pretty=format:'- %s' \
+              | grep -viE '^- version bump|^- version [0-9]|^- [0-9]+\.[0-9]+\.[0-9]+' || true
+          } > release-notes.md
+          cat release-notes.md
+
       - name: "Build release: Pre-release"
         if: ${{ env.release_status == 'pre-release' }}
         run: |
@@ -177,6 +196,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: ./deploy/${{ env.release_name }}-${{ env.release_tag }}.zip
+          body_path: release-notes.md
           prerelease: ${{ env.release_status == 'pre-release' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
