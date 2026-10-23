@@ -37,7 +37,7 @@ curl -X POST -u "import_bot:application_password" \
   "https://your-server.com/wp-json/gp-language-pack-server/v1/projects/your-project-slug/import"
 ```
 
-Pass the credentials from a secret, never inline in a shared script. See your plugin's `upload-pot` Grunt task for a Node version that keeps them out of argv.
+Pass the credentials from a secret (an environment variable or CI secret), never inline in a shared script. Note that `curl -u user:pass` puts the password in the command's arguments (argv), where any user on the machine can read it with `ps` and where it can end up in shell history and CI logs. To keep it out of argv, send it from a client that sets the `Authorization` header itself, such as Node's `fetch` (see the `upload-pot` task in the Mix and Match Products plugin's `Gruntfile.js`), or have curl read it from a config on stdin (`curl -K -`) or a `--netrc-file`.
 
 ### Pre-release strings
 
