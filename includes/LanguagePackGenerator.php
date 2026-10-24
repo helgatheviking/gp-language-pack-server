@@ -45,6 +45,11 @@ class LanguagePackGenerator {
 	const SINGLE_EVENT_HOOK = 'gp_language_pack_generate_single';
 
 	/**
+	 * GlotPress project meta key holding the project's text domain.
+	 */
+	const TEXTDOMAIN_META_KEY = 'gp_language_pack_textdomain';
+
+	/**
 	 * @var self|null
 	 */
 	private static ?self $instance = null;
@@ -260,6 +265,53 @@ class LanguagePackGenerator {
 	}
 
 	// -------------------------------------------------------------------------
+	// Text domain
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Returns the text domain used to name the files inside a project's packs.
+	 *
+	 * WordPress loads `{textdomain}-{locale}.mo`, so the files must be named
+	 * after the plugin or theme's text domain, which can differ from the
+	 * GlotPress project slug. Defaults to the project slug.
+	 *
+	 * @param GP_Project $project
+	 * @return string
+	 */
+	public static function get_textdomain( GP_Project $project ): string {
+		$stored     = gp_get_meta( 'project', $project->id, self::TEXTDOMAIN_META_KEY );
+		$textdomain = $stored ? (string) $stored : $project->slug;
+
+		/**
+		 * Filters the text domain used to name the files inside a project's packs.
+		 *
+		 * @param string     $textdomain Saved text domain, or the project slug.
+		 * @param GP_Project $project
+		 */
+		$textdomain = (string) apply_filters( 'gp_language_pack_project_textdomain', $textdomain, $project );
+
+		return sanitize_file_name( $textdomain );
+	}
+
+	/**
+	 * Saves a project's text domain. An empty value, or the project slug,
+	 * clears it so the slug is used.
+	 *
+	 * @param GP_Project $project
+	 * @param string     $textdomain
+	 */
+	public static function set_textdomain( GP_Project $project, string $textdomain ): void {
+		$textdomain = sanitize_key( $textdomain );
+
+		if ( '' === $textdomain || $project->slug === $textdomain ) {
+			gp_delete_meta( $project->id, self::TEXTDOMAIN_META_KEY, null, 'project' );
+			return;
+		}
+
+		gp_update_meta( $project->id, self::TEXTDOMAIN_META_KEY, $textdomain, 'project' );
+	}
+
+	// -------------------------------------------------------------------------
 	// Core generation
 	// -------------------------------------------------------------------------
 
@@ -297,10 +349,13 @@ class LanguagePackGenerator {
 			);
 		}
 
-		// Change detection.
+		$base = self::get_textdomain( $project ) . '-' . sanitize_file_name( $wp_locale );
+
+		// Change detection. A pack built under a different text domain is
+		// rebuilt even if no translations changed.
 		$dest_dir  = trailingslashit( gp_language_pack_dir() ) . sanitize_file_name( $project->slug );
 		$dest_file = $dest_dir . '/' . RestController::get_pack_filename( $project->slug, $wp_locale );
-		if ( ! $force && file_exists( $dest_file ) ) {
+		if ( ! $force && file_exists( $dest_file ) && self::zip_contains( $dest_file, $base . '.mo' ) ) {
 			$zip_mtime     = filemtime( $dest_file );
 			$last_modified = $set->last_modified();
 			if ( $last_modified && strtotime( $last_modified ) <= $zip_mtime ) {
@@ -341,7 +396,6 @@ class LanguagePackGenerator {
 
 		// 2. Write .po to a temp directory.
 		$tmp_dir = get_temp_dir() . 'gp-language-packs-' . uniqid( '', true );
-		$base    = sanitize_file_name( $project->slug ) . '-' . sanitize_file_name( $wp_locale );
 		$po_file = $tmp_dir . '/' . $base . '.po';
 		$mo_file = $tmp_dir . '/' . $base . '.mo';
 		$zip_tmp = $tmp_dir . '/' . $base . '.zip';
@@ -529,6 +583,29 @@ class LanguagePackGenerator {
 	}
 
 	/**
+	 * Whether a zip archive contains a file with the given name.
+	 *
+	 * @param string $zip_file Absolute path to the zip.
+	 * @param string $name     File name inside the zip.
+	 * @return bool
+	 */
+	private static function zip_contains( string $zip_file, string $name ): bool {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			return true; // Can't tell; fall back to timestamp-only change detection.
+		}
+
+		$zip = new ZipArchive();
+		if ( true !== $zip->open( $zip_file ) ) {
+			return false;
+		}
+
+		$found = false !== $zip->locateName( $name );
+		$zip->close();
+
+		return $found;
+	}
+
+	/**
 	 * Recursively removes a temporary working directory.
 	 *
 	 * @param string $dir Absolute path to temp directory.
@@ -638,7 +715,7 @@ class LanguagePackGenerator {
 			return;
 		}
 
-		$textdomain = apply_filters( 'gp_language_pack_project_textdomain', $project->slug, $project );
+		$textdomain = self::get_textdomain( $project );
 		$wp_locale  = $locale->wp_locale;
 
 		foreach ( $js_translations as $file_path => $file_trans ) {

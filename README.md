@@ -106,6 +106,10 @@ if ( file_exists( __DIR__ . '/Client.php' ) ) {
 3.  **Modified Checking:** Inspects the file modification time (`filemtime`) of the local `.mo` file under `wp-content/languages/plugins/` (or `themes/`). The client also records an md5 of each `.mo` it installs, and skips any locale whose local file has been edited since, so hand edits are never overwritten.
 4.  **Native Updates:** If the local file is missing or older than the server release, it injects the update directly into WordPress's core update transient. WordPress then natively presents the update under **Dashboard > Updates > Translations** and handles the download and extraction automatically.
 
+### Project slug vs. text domain
+
+WordPress loads translations by text domain (`{textdomain}-{locale}.mo`), so the files inside each pack are named after the text domain, not the GlotPress project slug. By default the two are assumed to match. If they don't (e.g. project `name-your-price`, text domain `wc_name_your_price`), set the project's text domain under **Tools > Language Pack Server**: expand the project, enter the text domain and click **Save and rebuild packs**. The `gp_language_pack_project_textdomain` filter can override it in code.
+
 ---
 
 ## 4. WP-CLI Command
