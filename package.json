@@ -10,7 +10,7 @@
     "betarelease": "npm run update-version && npm run build",
     "update-version": "node bin/update-version.js",
     "version": "npm run update-version && git add gp-language-pack-server.php",
-    "postversion": "git push origin HEAD --follow-tags",
+    "postversion": "git push --follow-tags",
     "build": "composer install --no-interaction && npm run make-pot && composer install --no-dev --optimize-autoloader --no-interaction && npm run zip && composer install --no-interaction"
   },
   "files": [
