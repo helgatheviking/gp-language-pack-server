@@ -311,6 +311,22 @@ class LanguagePackGenerator {
 		gp_update_meta( $project->id, self::TEXTDOMAIN_META_KEY, $textdomain, 'project' );
 	}
 
+	/**
+	 * Rebuilds all of a project's packs that meet the threshold, e.g. after
+	 * its text domain changes.
+	 *
+	 * @param GP_Project $project
+	 */
+	public static function rebuild_project( GP_Project $project ): void {
+		$threshold = self::get_default_threshold();
+
+		foreach ( GP::$translation_set->by_project_id( $project->id ) as $set ) {
+			if ( $set->percent_translated() >= $threshold ) {
+				self::log_if_error( self::generate( $project, $set, true ), $project, $set );
+			}
+		}
+	}
+
 	// -------------------------------------------------------------------------
 	// Core generation
 	// -------------------------------------------------------------------------

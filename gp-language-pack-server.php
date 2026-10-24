@@ -25,6 +25,7 @@ defined( 'ABSPATH' ) || exit;
 use HelgaTheViking\GPLanguagePack\Server\RestApi;
 use HelgaTheViking\GPLanguagePack\Server\LanguagePackGenerator;
 use HelgaTheViking\GPLanguagePack\Server\AdminController;
+use HelgaTheViking\GPLanguagePack\Server\ProjectForm;
 
 // ---------------------------------------------------------------------------
 // Update server
@@ -156,6 +157,7 @@ function gp_language_pack_init(): void {
 
 	RestApi::instance();
 	LanguagePackGenerator::instance();
+	ProjectForm::instance();
 
 	if ( is_admin() ) {
 		AdminController::instance();

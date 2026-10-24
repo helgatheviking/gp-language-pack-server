@@ -108,7 +108,7 @@ if ( file_exists( __DIR__ . '/Client.php' ) ) {
 
 ### Project slug vs. text domain
 
-WordPress loads translations by text domain (`{textdomain}-{locale}.mo`), so the files inside each pack are named after the text domain, not the GlotPress project slug. By default the two are assumed to match. If they don't (e.g. project `name-your-price`, text domain `wc_name_your_price`), set the project's text domain under **Tools > Language Pack Server**: expand the project, enter the text domain and click **Save and rebuild packs**. The `gp_language_pack_project_textdomain` filter can override it in code.
+WordPress loads translations by text domain (`{textdomain}-{locale}.mo`), so the files inside each pack are named after the text domain, not the GlotPress project slug. By default the two are assumed to match. If they don't (e.g. project `name-your-price`, text domain `wc_name_your_price`), set the **Text domain** field on the project's GlotPress Edit (or New) project form. Changing it rebuilds the project's packs straight away; **Tools > Language Pack Server** shows each project's current text domain. The `gp_language_pack_project_textdomain` filter can override it in code.
 
 ---
 

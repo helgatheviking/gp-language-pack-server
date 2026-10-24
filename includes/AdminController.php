@@ -38,7 +38,6 @@ class AdminController {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'wp_ajax_gp_language_pack_ajax_generate', array( $this, 'ajax_generate_pack' ) );
 		add_action( 'wp_ajax_gp_language_pack_ajax_delete', array( $this, 'ajax_delete_pack' ) );
-		add_action( 'wp_ajax_gp_language_pack_ajax_save_textdomain', array( $this, 'ajax_save_textdomain' ) );
 	}
 
 	/**
@@ -143,65 +142,6 @@ class AdminController {
 		}
 
 		wp_send_json_error( array( 'message' => __( 'Language pack file not found on disk.', 'gp-language-pack-server' ) ) );
-	}
-
-	/**
-	 * Handles AJAX saving of a project's text domain.
-	 *
-	 * Rebuilds the project's packs straight away so the files inside them
-	 * use the new name.
-	 */
-	public function ajax_save_textdomain(): void {
-		check_ajax_referer( 'gp_language_pack_admin_nonce', 'nonce' );
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'gp-language-pack-server' ) ) );
-		}
-
-		$project_id = isset( $_POST['project_id'] ) ? (int) $_POST['project_id'] : 0;
-		$textdomain = isset( $_POST['textdomain'] ) ? sanitize_key( wp_unslash( $_POST['textdomain'] ) ) : '';
-
-		$project = GP::$project->get( $project_id );
-		if ( ! $project ) {
-			wp_send_json_error( array( 'message' => __( 'Project not found.', 'gp-language-pack-server' ) ) );
-		}
-
-		LanguagePackGenerator::set_textdomain( $project, $textdomain );
-
-		$threshold = LanguagePackGenerator::get_default_threshold();
-		$rebuilt   = 0;
-		$errors    = array();
-
-		foreach ( GP::$translation_set->by_project_id( $project->id ) as $set ) {
-			if ( $set->percent_translated() < $threshold ) {
-				continue;
-			}
-
-			$result = LanguagePackGenerator::generate( $project, $set, true );
-			if ( is_wp_error( $result ) ) {
-				$errors[] = $set->locale . ': ' . $result->get_error_message();
-			} else {
-				$rebuilt++;
-			}
-		}
-
-		$message = sprintf(
-			/* translators: 1: text domain, 2: number of language packs rebuilt */
-			_n(
-				'Text domain set to "%1$s". Rebuilt %2$d language pack.',
-				'Text domain set to "%1$s". Rebuilt %2$d language packs.',
-				$rebuilt,
-				'gp-language-pack-server'
-			),
-			LanguagePackGenerator::get_textdomain( $project ),
-			$rebuilt
-		);
-
-		if ( $errors ) {
-			$message .= ' ' . __( 'Failed:', 'gp-language-pack-server' ) . ' ' . implode( '; ', $errors );
-		}
-
-		wp_send_json_success( array( 'message' => $message ) );
 	}
 
 	/**
@@ -424,15 +364,6 @@ class AdminController {
 								<tr class="gp-lp-sets-row" id="sets-row-<?php echo esc_attr( $project->id ); ?>" style="display: none;">
 									<td colspan="4">
 										<div class="gp-lp-sets-container">
-											<p class="gp-lp-textdomain-form">
-												<label for="gp-lp-textdomain-<?php echo esc_attr( $project->id ); ?>"><strong><?php esc_html_e( 'Text domain', 'gp-language-pack-server' ); ?></strong></label>
-												<input type="text" class="regular-text code" id="gp-lp-textdomain-<?php echo esc_attr( $project->id ); ?>"
-													   value="<?php echo esc_attr( $textdomain ); ?>" placeholder="<?php echo esc_attr( $project->slug ); ?>" />
-												<button type="button" class="button btn-save-textdomain" data-project-id="<?php echo esc_attr( $project->id ); ?>">
-													<?php esc_html_e( 'Save and rebuild packs', 'gp-language-pack-server' ); ?>
-												</button>
-												<br><span class="description"><?php esc_html_e( 'The plugin or theme\'s text domain. Files inside the language packs are named after it, because WordPress loads translations by text domain. Leave empty to use the project slug.', 'gp-language-pack-server' ); ?></span>
-											</p>
 											<?php if ( empty( $sets ) ) : ?>
 												<p class="description"><?php esc_html_e( 'No translation sets exist for this project yet.', 'gp-language-pack-server' ); ?></p>
 											<?php else : ?>
@@ -649,42 +580,6 @@ class AdminController {
 							if (result.error) {
 								alert('Error: ' + result.error);
 							}
-						});
-					});
-				});
-
-				// Save a project's text domain and rebuild its packs
-				document.querySelectorAll('.btn-save-textdomain').forEach(btn => {
-					btn.addEventListener('click', function() {
-						const projId = this.dataset.projectId;
-						const input = document.getElementById('gp-lp-textdomain-' + projId);
-
-						this.disabled = true;
-						const oldText = this.innerText;
-						this.innerText = '<?php esc_attr_e( 'Saving...', 'gp-language-pack-server' ); ?>';
-
-						fetch(ajaxUrl, {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-							body: `action=gp_language_pack_ajax_save_textdomain&project_id=${projId}&textdomain=${encodeURIComponent(input.value)}&nonce=${nonce}`
-						})
-						.then(res => res.json())
-						.then(res => {
-							this.disabled = false;
-							this.innerText = oldText;
-
-							if (res.success) {
-								// Reload so pack status, sizes and dates reflect the rebuild.
-								alert(res.data.message);
-								window.location.reload();
-							} else {
-								alert('Error: ' + res.data.message);
-							}
-						})
-						.catch(err => {
-							this.disabled = false;
-							this.innerText = oldText;
-							alert('An unexpected error occurred.');
 						});
 					});
 				});
