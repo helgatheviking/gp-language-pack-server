@@ -430,7 +430,7 @@ class LanguagePackGenerator {
 		}
 
 		// 3. Compile .mo.
-		$mo_result = self::compile_mo( $po_file, $mo_file, $po_string );
+		$mo_result = self::compile_mo( $po_file, $mo_file );
 		if ( is_wp_error( $mo_result ) ) {
 			self::cleanup( $tmp_dir );
 			return $mo_result;
@@ -489,8 +489,12 @@ class LanguagePackGenerator {
 		}
 
 		require_once ABSPATH . 'wp-admin/includes/file.php';
-		WP_Filesystem();
 		global $wp_filesystem;
+
+		if ( ! WP_Filesystem() || ! $wp_filesystem ) {
+			self::cleanup( $tmp_dir );
+			return new WP_Error( 'gp_language_pack_filesystem', 'Could not initialise the WordPress filesystem.' );
+		}
 
 		if ( ! $wp_filesystem->copy( $zip_tmp, $dest_file, true ) ) {
 			self::cleanup( $tmp_dir );
@@ -522,12 +526,11 @@ class LanguagePackGenerator {
 	 * Tries the system msgfmt binary first (fast). Falls back to WordPress
 	 * core's PO/MO classes which are always available.
 	 *
-	 * @param string $po_file   Absolute path to source .po file.
-	 * @param string $mo_file   Absolute path to write .mo file.
-	 * @param string $po_string Raw PO content (used for the PHP fallback).
+	 * @param string $po_file Absolute path to source .po file.
+	 * @param string $mo_file Absolute path to write .mo file.
 	 * @return true|WP_Error
 	 */
-	private static function compile_mo( string $po_file, string $mo_file, string $po_string ) {
+	private static function compile_mo( string $po_file, string $mo_file ) {
 		if ( function_exists( 'exec' ) && self::has_msgfmt() ) {
 			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
 			exec(
@@ -540,7 +543,7 @@ class LanguagePackGenerator {
 			}
 		}
 
-		return self::compile_mo_with_wp_mo( $po_string, $mo_file );
+		return self::compile_mo_with_wp_mo( $po_file, $mo_file );
 	}
 
 	/**
@@ -563,25 +566,19 @@ class LanguagePackGenerator {
 	/**
 	 * Compiles a .mo file using WordPress core's PO/MO classes.
 	 *
-	 * Always available — no external binary required.
+	 * Always available — no external binary required, and no wp-admin
+	 * includes, so it works from cron and GlotPress's front-end pages.
 	 *
-	 * @param string $po_string PO file contents.
-	 * @param string $mo_file   Destination .mo path.
+	 * @param string $po_file Source .po path.
+	 * @param string $mo_file Destination .mo path.
 	 * @return true|WP_Error
 	 */
-	private static function compile_mo_with_wp_mo( string $po_string, string $mo_file ) {
+	private static function compile_mo_with_wp_mo( string $po_file, string $mo_file ) {
 		require_once ABSPATH . WPINC . '/pomo/po.php';
 		require_once ABSPATH . WPINC . '/pomo/mo.php';
 
-		$po  = new PO();
-		$tmp = wp_tempnam( 'gp-lp-' );
-
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-		file_put_contents( $tmp, $po_string );
-		$imported = $po->import_from_file( $tmp );
-		@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
-
-		if ( ! $imported ) {
+		$po = new PO();
+		if ( ! $po->import_from_file( $po_file ) ) {
 			return new WP_Error( 'gp_language_pack_po_parse', 'Could not parse PO data.' );
 		}
 
